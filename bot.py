@@ -1241,6 +1241,10 @@ def criar_aplicacao() -> Application:
 def main() -> None:
     logger.info("Iniciando bot Cuidar+")
 
+    # O Python 3.14 não cria mais um event loop automaticamente,
+    # então criamos um antes de iniciar o polling.
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
     application = criar_aplicacao()
 
     # O polling mantém o bot conectado ao Telegram.
