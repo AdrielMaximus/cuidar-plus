@@ -2,119 +2,236 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2f7d6d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cuidar+">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Cuidar+</title>
 <style>
-  body { font-family: system-ui, sans-serif; margin: 0; background: #f4f7f6; color: #222; }
-  header { background: #2f7d6d; color: #fff; padding: 14px 16px; font-size: 20px; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; margin: 0; background: #f4f7f6; color: #1f2d2a;
+         font-size: 18px; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+  header { background: #2f7d6d; color: #fff; padding: 12px 16px; display: flex; align-items: center;
+           gap: 10px; font-size: 24px; font-weight: 700; position: sticky; top: 0; z-index: 5; }
+  header svg { width: 38px; height: 38px; }
   main { max-width: 600px; margin: 0 auto; padding: 16px; }
-  .card { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px #0002; }
-  input, select, textarea, button { width: 100%; box-sizing: border-box; padding: 12px; margin-top: 8px; font-size: 16px; border-radius: 8px; border: 1px solid #bbb; }
-  button { background: #2f7d6d; color: #fff; border: none; cursor: pointer; }
-  button.sec { background: #e3ecea; color: #1d4d43; }
-  .linha { display: flex; gap: 8px; }
-  .item { border-bottom: 1px solid #eee; padding: 8px 0; }
-  .item small { color: #666; }
-  .oculto { display: none; }
-  #msg { color: #b00020; min-height: 20px; }
+  .oculto { display: none !important; }
+  .card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+          box-shadow: 0 1px 4px #0002; }
+  h2 { margin: 0 0 8px; font-size: 22px; }
+  h3 { margin: 0 0 10px; font-size: 20px; }
+  input, textarea { width: 100%; padding: 14px; margin-top: 10px; font-size: 18px; border-radius: 12px;
+                    border: 2px solid #c9d6d3; font-family: inherit; }
+  button { font-family: inherit; font-size: 18px; cursor: pointer; }
+  .btn { width: 100%; padding: 16px; margin-top: 10px; border-radius: 12px; border: none;
+         background: #2f7d6d; color: #fff; font-weight: 600; }
+  .btn.sec { background: #e3ecea; color: #1d4d43; }
+  .btn:disabled { opacity: .6; }
+  .linha { display: flex; gap: 10px; }
+  .linha > * { flex: 1; }
+
+  #toast { position: fixed; top: 70px; left: 12px; right: 12px; max-width: 576px; margin: 0 auto;
+           padding: 14px; border-radius: 12px; color: #fff; font-weight: 600; z-index: 20; }
+  #toast.erro { background: #b00020; }
+  #toast.ok { background: #1b7a45; }
+
+  .banner { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+            border-left: 8px solid #2f7d6d; box-shadow: 0 1px 4px #0002; }
+  .banner small { color: #5b6b67; font-size: 16px; }
+  .banner .nome { font-size: 30px; font-weight: 800; line-height: 1.1; }
+  .banner .cod { color: #5b6b67; font-size: 16px; margin-top: 4px; }
+
+  .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cartao { background: #fff; border: 2px solid #dde7e4; border-radius: 18px; padding: 18px 8px;
+            font-weight: 700; color: #1f2d2a; display: flex; flex-direction: column;
+            align-items: center; gap: 6px; box-shadow: 0 1px 3px #0001; }
+  .cartao .ic { font-size: 42px; line-height: 1; }
+  .cartao:active { background: #e3f1ee; }
+
+  .item { border-bottom: 1px solid #e6eceb; padding: 10px 0; }
+  .item:last-child { border-bottom: none; }
+  .item small { color: #5b6b67; font-size: 15px; }
+  .vazio { color: #5b6b67; padding: 8px 0; }
+
+  .idoso-op { width: 100%; text-align: left; padding: 16px; margin-top: 10px; border-radius: 14px;
+              background: #fff; border: 2px solid #c9d6d3; font-weight: 600; }
+  .idoso-op.ativo { border-color: #2f7d6d; background: #e3f1ee; }
+
+  nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #d5e0dd;
+        display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
+  nav button { flex: 1; background: none; border: none; padding: 10px 2px; font-size: 14px;
+               color: #5b6b67; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav button .ic { font-size: 26px; }
+  nav button.ativo { color: #2f7d6d; font-weight: 700; }
+
+  #fundo { position: fixed; inset: 0; background: #0006; z-index: 30; display: flex; align-items: flex-end; }
+  #folha { background: #fff; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 22px 22px 0 0;
+           padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .chip { padding: 14px 18px; border-radius: 30px; border: 2px solid #c9d6d3; background: #fff;
+          font-weight: 600; color: #1f2d2a; }
+  .chip.sel { background: #2f7d6d; border-color: #2f7d6d; color: #fff; }
+  .chip.num { min-width: 56px; text-align: center; }
+  .login-logo { text-align: center; margin-bottom: 8px; }
+  .login-logo svg { width: 90px; height: 90px; }
+  .login-logo div { font-size: 30px; font-weight: 800; color: #2f7d6d; }
 </style>
 </head>
 <body>
-<header>Cuidar+</header>
-<main>
-  <p id="msg"></p>
 
-  <!-- Login -->
+<header>
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="50" fill="#fff"/>
+    <path d="M50 82 C20 60 12 42 12 30 C12 19 21 12 31 12 C39 12 46 16 50 23 C54 16 61 12 69 12 C79 12 88 19 88 30 C88 42 80 60 50 82 Z" fill="#2f7d6d" transform="translate(0 4)"/>
+    <rect x="45" y="30" width="10" height="30" fill="#fff"/>
+    <rect x="35" y="40" width="30" height="10" fill="#fff"/>
+  </svg>
+  Cuidar+
+</header>
+
+<div id="toast" class="oculto"></div>
+
+<main>
+  <!-- LOGIN -->
   <section id="telaLogin" class="card oculto">
-    <h3>Entrar</h3>
-    <input id="email" type="email" placeholder="E-mail">
-    <input id="senha" type="password" placeholder="Senha (mínimo 6 caracteres)">
-    <input id="nomeUsuario" placeholder="Seu nome (só no primeiro cadastro)">
-    <div class="linha">
-      <button onclick="entrarConta()">Entrar</button>
-      <button class="sec" onclick="criarConta()">Criar conta</button>
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="50" fill="#2f7d6d"/>
+        <path d="M50 82 C20 60 12 42 12 30 C12 19 21 12 31 12 C39 12 46 16 50 23 C54 16 61 12 69 12 C79 12 88 19 88 30 C88 42 80 60 50 82 Z" fill="#fff" transform="translate(0 4)"/>
+        <rect x="45" y="30" width="10" height="30" fill="#2f7d6d"/>
+        <rect x="35" y="40" width="30" height="10" fill="#2f7d6d"/>
+      </svg>
+      <div>Cuidar+</div>
     </div>
+    <h2>Entrar</h2>
+    <input id="email" type="email" placeholder="E-mail" autocomplete="email">
+    <input id="senha" type="password" placeholder="Senha (mínimo 6 caracteres)" autocomplete="current-password">
+    <input id="nomeUsuario" placeholder="Seu nome (só no primeiro cadastro)">
+    <button class="btn" onclick="entrarConta()">Entrar</button>
+    <button class="btn sec" onclick="criarConta()">Criar conta</button>
   </section>
 
-  <!-- Aplicativo -->
+  <!-- APP -->
   <section id="telaApp" class="oculto">
-    <div class="card">
-      <label>Idoso atual</label>
-      <select id="selIdoso" onchange="trocarIdoso()"></select>
-      <div class="linha">
-        <input id="codigoEntrar" placeholder="Código (ex.: MARIA78)">
-        <button class="sec" onclick="entrarPorCodigo()">Entrar</button>
-      </div>
-      <div class="linha">
-        <input id="nomeNovo" placeholder="Nome do novo idoso">
-        <button class="sec" onclick="cadastrarIdoso()">Cadastrar</button>
-      </div>
+    <div class="banner" id="banner"></div>
+
+    <div id="vInicio" class="vista">
+      <h2>O que você quer registrar?</h2>
+      <div class="grade" id="grade"></div>
     </div>
 
-    <div class="card" id="boxRegistro">
-      <h3>Novo registro</h3>
-      <select id="tipo">
-        <option>Medicamento administrado</option>
-        <option>Dor</option>
-        <option>Alimentação</option>
-        <option>Hidratação</option>
-        <option>Sono</option>
-        <option>Humor / Comportamento</option>
-        <option>Queda</option>
-        <option>Sintoma / Intercorrência</option>
-        <option>Observação livre</option>
-      </select>
-      <textarea id="valor" rows="3" placeholder="Descreva (para Dor, use um número de 0 a 10)"></textarea>
-      <button onclick="salvarRegistro()">Salvar registro</button>
+    <div id="vHoje" class="vista oculto">
+      <div class="card"><h3>Registros de hoje</h3><div id="listaHoje"></div></div>
     </div>
 
-    <div class="card">
+    <div id="vResumo" class="vista oculto">
       <div class="linha">
-        <button class="sec" onclick="verHoje()">Ver hoje</button>
-        <button class="sec" onclick="resumo(7)">Resumo 7 dias</button>
-        <button class="sec" onclick="resumo(14)">Resumo 14 dias</button>
+        <button class="btn sec" onclick="resumo(7)">Últimos 7 dias</button>
+        <button class="btn sec" onclick="resumo(14)">Últimos 14 dias</button>
       </div>
-      <div id="lista"></div>
+      <div class="card" style="margin-top:16px"><div id="listaResumo"></div></div>
     </div>
 
-    <button class="sec" onclick="sair()">Sair da conta</button>
+    <div id="vIdosos" class="vista oculto">
+      <div class="card">
+        <h3>Meus idosos</h3>
+        <div id="listaIdosos"></div>
+      </div>
+      <div class="card">
+        <h3>Entrar com um código</h3>
+        <input id="codigoEntrar" placeholder="Código (ex.: MARIA78)" autocapitalize="characters">
+        <button class="btn sec" onclick="entrarPorCodigo()">Entrar com código</button>
+      </div>
+      <div class="card">
+        <h3>Cadastrar novo idoso</h3>
+        <input id="nomeNovo" placeholder="Nome do idoso">
+        <button class="btn sec" onclick="cadastrarIdoso()">Cadastrar</button>
+      </div>
+      <button class="btn sec" onclick="sair()">Sair da conta</button>
+    </div>
   </section>
 </main>
 
+<nav id="menu" class="oculto">
+  <button data-v="inicio" onclick="mostrarVista('inicio')"><span class="ic">➕</span>Registrar</button>
+  <button data-v="hoje" onclick="mostrarVista('hoje')"><span class="ic">📋</span>Hoje</button>
+  <button data-v="resumo" onclick="mostrarVista('resumo')"><span class="ic">📊</span>Resumo</button>
+  <button data-v="idosos" onclick="mostrarVista('idosos')"><span class="ic">👵</span>Idosos</button>
+</nav>
+
+<div id="fundo" class="oculto" onclick="if(event.target===this)fecharFolha()">
+  <div id="folha"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL="https://hyvpcaxwerfxgjpnqaxo.supabase.co";
+const SUPABASE_URL = "https://hyvpcaxwerfxgjpnqaxo.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_e_EIPy-IqqwR_0-bLiA8pA_CkRM79xU";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const TIPOS = [
+  { tipo: "Medicamento administrado", rotulo: "Remédio", ic: "💊", pergunta: "Qual remédio foi dado?",
+    texto: "Nome do remédio (opcional)", padrao: "Administrado" },
+  { tipo: "Dor", rotulo: "Dor", ic: "😣", pergunta: "Quanto está doendo? (0 = nada, 10 = muito)",
+    opcoes: ["0","1","2","3","4","5","6","7","8","9","10"], dor: true },
+  { tipo: "Alimentação", rotulo: "Comida", ic: "🍽️", pergunta: "Como foi a refeição?",
+    opcoes: ["Comeu bem", "Comeu pouco", "Não quis comer"], texto: "Observação (opcional)" },
+  { tipo: "Hidratação", rotulo: "Água", ic: "💧", pergunta: "Como foi a hidratação?",
+    opcoes: ["Bebeu bem", "Bebeu pouco", "Recusou"], texto: "Observação (opcional)" },
+  { tipo: "Sono", rotulo: "Sono", ic: "😴", pergunta: "Como foi o sono?",
+    opcoes: ["Dormiu bem", "Dormiu mal", "Não dormiu"], texto: "Observação (opcional)" },
+  { tipo: "Humor / Comportamento", rotulo: "Humor", ic: "🙂", pergunta: "Como está o humor?",
+    opcoes: ["Alegre", "Calmo", "Agitado", "Triste", "Confuso"], texto: "Observação (opcional)" },
+  { tipo: "Queda", rotulo: "Queda", ic: "⚠️", pergunta: "O que aconteceu?",
+    texto: "Descreva a queda", obrigatorio: true },
+  { tipo: "Sintoma / Intercorrência", rotulo: "Sintoma", ic: "🌡️", pergunta: "Qual sintoma?",
+    texto: "Descreva o sintoma", obrigatorio: true },
+  { tipo: "Observação livre", rotulo: "Anotação", ic: "📝", pergunta: "Escreva sua anotação",
+    texto: "Anotação", obrigatorio: true }
+];
+const iconeDe = (tipo) => (TIPOS.find(t => t.tipo === tipo) || {}).ic || "📝";
+
 let usuario = null;
+let idosos = [];
+let atual = null;
+let cfg = null;
+let escolha = null;
+let tToast = null;
+
 const $ = (id) => document.getElementById(id);
-const aviso = (t) => { $("msg").textContent = t || ""; };
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, c =>
   ({ "&": "&", "<": "<", ">": ">", '"': "&quot;", "'": "&#39;" }[c]));
 const fmt = (iso) => new Date(iso).toLocaleString("pt-BR",
   { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+
+function aviso(texto, ok) {
+  const t = $("toast");
+  clearTimeout(tToast);
+  if (!texto) { t.classList.add("oculto"); return; }
+  t.textContent = texto;
+  t.className = ok ? "ok" : "erro";
+  tToast = setTimeout(() => t.classList.add("oculto"), 5000);
+}
 
 async function iniciar() {
   const { data } = await sb.auth.getSession();
   usuario = data.session?.user ?? null;
   $("telaLogin").classList.toggle("oculto", !!usuario);
   $("telaApp").classList.toggle("oculto", !usuario);
-  if (usuario) await carregarIdosos();
+  $("menu").classList.toggle("oculto", !usuario);
+  if (usuario) { montarGrade(); await carregarIdosos(); }
 }
 
 async function criarConta() {
   aviso();
   const nome = $("nomeUsuario").value.trim();
   const { error } = await sb.auth.signUp({
-    email: $("email").value.trim(),
-    password: $("senha").value,
-    options: { data: { nome } }
-  });
+    email: $("email").value.trim(), password: $("senha").value, options: { data: { nome } } });
   if (error) return aviso(error.message);
-  aviso("Conta criada. Se pedir confirmação, verifique seu e-mail e depois clique em Entrar.");
+  aviso("Conta criada. Se pedir confirmação, verifique seu e-mail e depois clique em Entrar.", true);
   iniciar();
 }
 
@@ -126,34 +243,64 @@ async function entrarConta() {
   iniciar();
 }
 
-async function sair() { await sb.auth.signOut(); iniciar(); }
+async function sair() { await sb.auth.signOut(); idosos = []; atual = null; iniciar(); }
 
-function nomeDoUsuario() {
-  return usuario.user_metadata?.nome || usuario.email;
+const nomeDoUsuario = () => usuario.user_metadata?.nome || usuario.email;
+
+function mostrarVista(v) {
+  document.querySelectorAll(".vista").forEach(e => e.classList.add("oculto"));
+  $("v" + v[0].toUpperCase() + v.slice(1)).classList.remove("oculto");
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("ativo", b.dataset.v === v));
+  window.scrollTo(0, 0);
+  if (v === "hoje") verHoje();
+  if (v === "resumo") resumo(7);
+  if (v === "idosos") desenharIdosos();
+}
+
+function montarGrade() {
+  $("grade").innerHTML = "";
+  TIPOS.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "cartao";
+    b.innerHTML = `<span class="ic">${t.ic}</span>${esc(t.rotulo)}`;
+    b.onclick = () => abrirFolha(i);
+    $("grade").appendChild(b);
+  });
+}
+
+function desenharBanner() {
+  if (!atual) {
+    $("banner").innerHTML = `<small>Nenhum idoso selecionado</small>
+      <div class="nome">Cadastre ou entre com um código</div>`;
+    return;
+  }
+  $("banner").innerHTML = `<small>Cuidando de</small><div class="nome">${esc(atual.nome)}</div>
+    <div class="cod">Código para compartilhar: <b>${esc(atual.codigo)}</b></div>`;
+}
+
+function desenharIdosos() {
+  const box = $("listaIdosos");
+  box.innerHTML = idosos.length ? "" : `<p class="vazio">Nenhum idoso ainda.</p>`;
+  idosos.forEach(i => {
+    const b = document.createElement("button");
+    b.className = "idoso-op" + (atual && atual.codigo === i.codigo ? " ativo" : "");
+    b.innerHTML = `${esc(i.nome)}<br><small>Código: ${esc(i.codigo)}</small>`;
+    b.onclick = () => { atual = i; localStorage.setItem("idosoAtual", i.codigo);
+      desenharBanner(); mostrarVista("inicio"); };
+    box.appendChild(b);
+  });
 }
 
 async function carregarIdosos() {
   const { data, error } = await sb.from("vinculos_app")
     .select("codigo_idoso, idosos(nome)").order("joined_at", { ascending: false });
   if (error) return aviso("Não foi possível carregar seus idosos.");
-  const sel = $("selIdoso");
-  const atual = localStorage.getItem("idosoAtual");
-  sel.innerHTML = "";
-  data.forEach(v => {
-    const o = document.createElement("option");
-    o.value = v.codigo_idoso;
-    o.textContent = `${v.idosos?.nome ?? "Idoso"} (${v.codigo_idoso})`;
-    sel.appendChild(o);
-  });
-  if (atual && data.some(v => v.codigo_idoso === atual)) sel.value = atual;
-  $("boxRegistro").classList.toggle("oculto", data.length === 0);
-  if (data.length === 0) aviso("Entre com um código ou cadastre um idoso para começar.");
-  trocarIdoso();
-}
-
-function trocarIdoso() {
-  localStorage.setItem("idosoAtual", $("selIdoso").value);
-  $("lista").innerHTML = "";
+  idosos = data.map(v => ({ codigo: v.codigo_idoso, nome: v.idosos?.nome ?? "Idoso" }));
+  const salvo = localStorage.getItem("idosoAtual");
+  atual = idosos.find(i => i.codigo === salvo) || idosos[0] || null;
+  desenharBanner();
+  mostrarVista(atual ? "inicio" : "idosos");
+  if (!atual) aviso("Entre com um código ou cadastre um idoso para começar.");
 }
 
 async function entrarPorCodigo() {
@@ -164,7 +311,8 @@ async function entrarPorCodigo() {
   if (error) return aviso("Código não encontrado. Confira e tente novamente.");
   localStorage.setItem("idosoAtual", codigo.toUpperCase());
   $("codigoEntrar").value = "";
-  carregarIdosos();
+  await carregarIdosos();
+  aviso("Pronto! Você entrou.", true);
 }
 
 function gerarCodigo(nome) {
@@ -185,38 +333,77 @@ async function cadastrarIdoso() {
     if (!error) {
       localStorage.setItem("idosoAtual", data);
       $("nomeNovo").value = "";
-      aviso(`Idoso cadastrado! Código para compartilhar: ${data}`);
-      return carregarIdosos();
+      await carregarIdosos();
+      return aviso(`Idoso cadastrado! Código para compartilhar: ${data}`, true);
     }
   }
   aviso("Não foi possível gerar um código. Tente novamente.");
 }
 
-async function salvarRegistro() {
-  aviso();
-  const codigo = $("selIdoso").value;
-  const tipo = $("tipo").value;
-  const valor = $("valor").value.trim();
-  if (!codigo) return aviso("Selecione um idoso.");
-  if (!valor) return aviso("Digite a informação do registro.");
-  if (tipo === "Dor") {
-    const n = Number(valor);
-    if (!Number.isInteger(n) || n < 0 || n > 10) return aviso("Para dor, informe um número inteiro de 0 a 10.");
+/* ---------- Registro ---------- */
+function abrirFolha(i) {
+  if (!atual) { aviso("Escolha um idoso primeiro."); return mostrarVista("idosos"); }
+  cfg = TIPOS[i]; escolha = null;
+  const f = $("folha");
+  f.innerHTML = `<h2>${cfg.ic} ${esc(cfg.rotulo)}</h2><p style="margin:0">${esc(cfg.pergunta)}</p>`;
+  if (cfg.opcoes) {
+    const box = document.createElement("div"); box.className = "chips";
+    cfg.opcoes.forEach(o => {
+      const c = document.createElement("button");
+      c.className = "chip" + (cfg.dor ? " num" : "");
+      c.textContent = o;
+      c.onclick = () => { escolha = o;
+        box.querySelectorAll(".chip").forEach(x => x.classList.toggle("sel", x === c)); };
+      box.appendChild(c);
+    });
+    f.appendChild(box);
   }
-  const { error } = await sb.from("registros").insert({
-    codigo_idoso: codigo, tipo, valor,
-    auth_user_id: usuario.id, user_name: nomeDoUsuario()
-  });
-  if (error) return aviso("Não foi possível salvar o registro.");
-  $("valor").value = "";
-  aviso("Registro salvo com sucesso.");
-  verHoje();
+  if (cfg.texto) {
+    const ta = document.createElement("textarea");
+    ta.id = "txtRegistro"; ta.rows = cfg.obrigatorio ? 4 : 2; ta.placeholder = cfg.texto;
+    f.appendChild(ta);
+  }
+  const salvar = document.createElement("button");
+  salvar.className = "btn"; salvar.id = "btnSalvar"; salvar.textContent = "Salvar registro";
+  salvar.onclick = salvarRegistro;
+  const cancelar = document.createElement("button");
+  cancelar.className = "btn sec"; cancelar.textContent = "Cancelar"; cancelar.onclick = fecharFolha;
+  f.append(salvar, cancelar);
+  $("fundo").classList.remove("oculto");
 }
 
+function fecharFolha() { $("fundo").classList.add("oculto"); }
+
+async function salvarRegistro() {
+  const txt = ($("txtRegistro")?.value || "").trim();
+  let valor;
+  if (cfg.dor) {
+    if (escolha === null) return aviso("Toque em um número de 0 a 10.");
+    valor = escolha;
+  } else if (cfg.opcoes) {
+    if (!escolha && !txt) return aviso("Escolha uma opção ou escreva algo.");
+    valor = [escolha, txt].filter(Boolean).join(" — ");
+  } else if (cfg.obrigatorio) {
+    if (!txt) return aviso("Escreva a informação do registro.");
+    valor = txt;
+  } else {
+    valor = txt || cfg.padrao;
+  }
+  const btn = $("btnSalvar"); btn.disabled = true;
+  const { error } = await sb.from("registros").insert({
+    codigo_idoso: atual.codigo, tipo: cfg.tipo, valor,
+    auth_user_id: usuario.id, user_name: nomeDoUsuario() });
+  btn.disabled = false;
+  if (error) return aviso("Não foi possível salvar o registro.");
+  fecharFolha();
+  aviso("Registro salvo!", true);
+}
+
+/* ---------- Consultas ---------- */
 async function buscar(inicio) {
-  const codigo = $("selIdoso").value;
+  if (!atual) return [];
   const { data, error } = await sb.from("registros").select("*")
-    .eq("codigo_idoso", codigo).gte("created_at", inicio.toISOString())
+    .eq("codigo_idoso", atual.codigo).gte("created_at", inicio.toISOString())
     .order("created_at", { ascending: true });
   if (error) { aviso("Não foi possível consultar os registros."); return []; }
   return data;
@@ -225,22 +412,22 @@ async function buscar(inicio) {
 async function verHoje() {
   const ini = new Date(); ini.setHours(0, 0, 0, 0);
   const regs = await buscar(ini);
-  $("lista").innerHTML = "<h3>Registros de hoje</h3>" + (regs.length
-    ? regs.map(r => `<div class="item"><b>${esc(r.tipo)}</b> — ${esc(r.valor)}<br>
+  $("listaHoje").innerHTML = regs.length
+    ? regs.reverse().map(r => `<div class="item">${iconeDe(r.tipo)} <b>${esc(r.tipo)}</b><br>${esc(r.valor)}<br>
         <small>${fmt(r.created_at)} · ${esc(r.user_name)}</small></div>`).join("")
-    : "<p>Nenhum registro hoje.</p>");
+    : `<p class="vazio">Nenhum registro hoje.</p>`;
 }
 
 async function resumo(dias) {
   const ini = new Date(Date.now() - dias * 86400000);
   const regs = await buscar(ini);
-  if (!regs.length) { $("lista").innerHTML = `<p>Nenhum registro nos últimos ${dias} dias.</p>`; return; }
+  if (!regs.length) { $("listaResumo").innerHTML = `<p class="vazio">Nenhum registro nos últimos ${dias} dias.</p>`; return; }
   const grupos = {};
   regs.forEach(r => (grupos[r.tipo] ||= []).push(r));
-  $("lista").innerHTML = `<h3>Resumo dos últimos ${dias} dias</h3>` +
-    Object.keys(grupos).sort().map(t => `<h4>${esc(t)}</h4>` +
-      grupos[t].map(r => `<div class="item">${fmt(r.created_at)} — ${esc(r.valor)}
-        <small>(${esc(r.user_name)})</small></div>`).join("")).join("");
+  $("listaResumo").innerHTML = `<h3>Últimos ${dias} dias</h3>` +
+    Object.keys(grupos).sort().map(t => `<h4 style="margin:14px 0 4px">${iconeDe(t)} ${esc(t)}</h4>` +
+      grupos[t].map(r => `<div class="item">${esc(r.valor)}<br>
+        <small>${fmt(r.created_at)} · ${esc(r.user_name)}</small></div>`).join("")).join("");
 }
 
 iniciar();
